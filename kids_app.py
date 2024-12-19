@@ -16,6 +16,10 @@ HEADERS = {
     "api-key": API_KEY,
 }
 
+# Validate API Key and Endpoint
+if not API_KEY or not ENDPOINT:
+    st.error("API Key or Endpoint is missing. Please check your configuration.")
+
 # Function to set background image
 def set_bg_image(image_file):
     with open(image_file, "rb") as f:
@@ -82,9 +86,12 @@ You are a children's story writer. Create an engaging, educational story for kid
     try:
         response = requests.post(ENDPOINT, headers=HEADERS, json=payload)
         response.raise_for_status()
-        return response.json()["choices"][0]["message"]["content"]
+        return response.json().get("choices", [{}])[0].get("message", {}).get("content", "No content returned")
+    except requests.exceptions.HTTPError as e:
+        st.error(f"HTTP Error: {e.response.status_code} - {e.response.text}")
     except requests.RequestException as e:
-        return f"Error fetching story: {e}"
+        st.error(f"Error fetching story: {e}")
+    return "Unable to fetch the story due to an error."
 
 # Function to parse choices from the story
 def parse_story_with_choices(content):
@@ -120,7 +127,8 @@ The explanation should relate to the story, teaching a positive value or lesson.
         response.raise_for_status()
         return response.json()["choices"][0]["message"]["content"]
     except requests.RequestException as e:
-        return "There was a problem generating the moral explanation. Please try again."
+        st.error(f"Error generating moral explanation: {e}")
+    return "Unable to fetch moral explanation."
 
 # Set Background Image
 set_bg_image("lit_lum.png")
@@ -138,8 +146,6 @@ if st.session_state["progress"] == 0:
 
     st.markdown("<br><br><br>", unsafe_allow_html=True)
     st.markdown("<br><br><br>", unsafe_allow_html=True)
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
 
     learning_goal = st.text_input("Enter a learning goal (e.g., kindness, teamwork):")
     animal = st.selectbox("Choose an animal:", ["Lion", "Elephant", "Penguin", "Dolphin"])
@@ -148,16 +154,17 @@ if st.session_state["progress"] == 0:
         st.session_state["goal"] = learning_goal
         st.session_state["animal"] = animal
         response = get_story_from_azure(learning_goal, animal)
-        story, choices = parse_story_with_choices(response)
-        st.session_state["story"] = [story]
-        st.session_state["choices"] = choices
-        st.session_state["progress"] = 1
-        st.rerun()
-
+        if "Error" in response:
+            st.warning("There was an issue fetching the story. Please try again.")
+        else:
+            story, choices = parse_story_with_choices(response)
+            st.session_state["story"] = [story]
+            st.session_state["choices"] = choices
+            st.session_state["progress"] = 1
+            st.rerun()
 
 # Story Progression
 elif 0 < st.session_state["progress"] < 4:
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
     st.markdown("<br><br><br>", unsafe_allow_html=True)
     st.markdown("<br><br><br>", unsafe_allow_html=True)
     
@@ -211,13 +218,7 @@ elif 0 < st.session_state["progress"] < 4:
 
 # End of Story
 if st.session_state["progress"] == 4:
-
     st.markdown("<br><br><br>", unsafe_allow_html=True)
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
-
     st.markdown("<div style='text-align:center; font-size:36px; font-weight:bold; color:beige;'>Congrats!!! 🎉 You finished the adventure! Thank you for playing!</div>", unsafe_allow_html=True)
     show_stars()
     if st.button("Start Over"):
