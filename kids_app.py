@@ -154,6 +154,7 @@ if st.session_state["progress"] == 0:
         st.session_state["progress"] = 1
         st.rerun()
 
+
 # Story Progression
 elif 0 < st.session_state["progress"] < 4:
     st.markdown("<br><br><br>", unsafe_allow_html=True)
