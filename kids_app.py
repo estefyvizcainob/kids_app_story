@@ -152,7 +152,7 @@ if st.session_state["progress"] == 0:
         st.session_state["story"] = [story]
         st.session_state["choices"] = choices
         st.session_state["progress"] = 1
-        st.experimental_rerun()
+        st.rerun()
 
 # Story Progression
 elif 0 < st.session_state["progress"] < 4:
@@ -195,7 +195,7 @@ elif 0 < st.session_state["progress"] < 4:
                 st.session_state["story"].append(story)
                 st.session_state["choices"] = choices
                 st.session_state["progress"] += 1
-                st.experimental_rerun()
+                st.rerun()
         with col2:
             if st.button(f"Option B: {st.session_state['choices']['Option B']}", key="OptionB"):
                 moral_explanation = get_moral_explanation(st.session_state["goal"], st.session_state["animal"])
@@ -221,7 +221,7 @@ if st.session_state["progress"] == 4:
     show_stars()
     if st.button("Start Over"):
         st.session_state.clear()
-        st.experimental_rerun()
+        st.rerun()
 
 
 
