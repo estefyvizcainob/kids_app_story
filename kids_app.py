@@ -3,14 +3,12 @@ import base64
 import requests
 from PIL import Image
 import streamlit as st
-from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Retrieve API Key and Endpoint from Streamlit Secrets
+API_KEY = st.secrets["API_KEY"]
+ENDPOINT = st.secrets["ENDPOINT"]
 
-# Configuration for Azure OpenAI
-API_KEY = os.getenv("API_KEY")
-ENDPOINT = "https://GENAISUSANA.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-02-15-preview"
+# Configuration for headers
 HEADERS = {
     "Content-Type": "application/json",
     "api-key": API_KEY,
@@ -18,7 +16,7 @@ HEADERS = {
 
 # Validate API Key and Endpoint
 if not API_KEY or not ENDPOINT:
-    st.error("API Key or Endpoint is missing. Please check your configuration.")
+    st.error("API Key or Endpoint is missing. Please check your Streamlit Secrets.")
 
 # Function to set background image
 def set_bg_image(image_file):
@@ -224,6 +222,7 @@ if st.session_state["progress"] == 4:
     if st.button("Start Over"):
         st.session_state.clear()
         st.rerun()
+
 
 
 
