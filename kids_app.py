@@ -5,7 +5,7 @@ from PIL import Image
 import streamlit as st
 
 # Retrieve API Key and Endpoint from Streamlit Secrets
-API_KEY = st.secrets["API_KEY"]
+API_KEY = st.secrets["general"]["API_KEY"]
 ENDPOINT = st.secrets["ENDPOINT"]
 
 # Configuration for headers
